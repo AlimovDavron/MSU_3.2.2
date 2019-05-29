@@ -66,8 +66,12 @@ int readInputData(char *inputFile, int *p, double** X, double** FX, int *n, doub
 }
 
 int main(int argc, char* argv[]) {
+    PlotHelper plotHelper;
     int n, k, p;
-    double *X, *FX, *tmp, a, b, *result;
+    double *X, *FX, a, b;
+    double *ChebyshevInterpolationCoefficients,
+           *linearInterpolationCoefficients,
+           *tmp;
     char* inputFile = "input.txt";
     char* outputFile = "output.txt";
     if(argc > 1){
@@ -87,14 +91,20 @@ int main(int argc, char* argv[]) {
         default:
             break;
     }
+
     cout << n << endl;
     for(int i = 0; i < n; i++){
         cout << X[i] << " " << FX[i] << endl;
     }
-    tmp = static_cast<double *>(malloc(memsize(n)));
-    Chebyshev_interpolation(n, X, FX, tmp, k, a, b);
-    draw(n, k, a, b, Pf);
 
+    ChebyshevInterpolationCoefficients = static_cast<double *>(malloc(ChebyshevInterpolationCoefficientsMemSize(n)));
+    linearInterpolationCoefficients = static_cast<double *>(malloc(LinearInterpolationCoefficientsMemSize(n)));
+    tmp = static_cast<double *>(malloc(tempMemSize(n)));
+
+    buildInterpolation(n, X, FX, ChebyshevInterpolationCoefficients, linearInterpolationCoefficients, tmp);
+
+    plotHelper.draw(k, a, b, ChebyshevInterpolationCoefficients, Pf);
+    plotHelper.draw(k, a, b, linearInterpolationCoefficients, LIf);
 
     return 0;
 }
